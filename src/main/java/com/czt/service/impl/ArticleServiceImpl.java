@@ -8,6 +8,7 @@ import com.czt.model.domain.Article;
 import com.czt.model.domain.Statistic;
 import com.czt.service.IArticleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +23,8 @@ public class ArticleServiceImpl implements IArticleService {
     private ArticleMapper articleMapper;
     @Autowired
     private StatisticMapper statisticMapper;
-
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     // 分页查询文章列表
     @Override
@@ -57,6 +59,19 @@ public class ArticleServiceImpl implements IArticleService {
         return articlelist;
     }
 
-
+    // 根据id查询单个文章详情，并使用Redis进行缓存管理
+    public Article selectArticleWithId(Integer id){
+        Article article = null;
+        Object o = redisTemplate.opsForValue().get("article_" + id);
+        if(o!=null){
+            article=(Article)o;
+        }else{
+            article = articleMapper.selectArticleWithId(id);
+            if(article!=null){
+                redisTemplate.opsForValue().set("article_" + id,article);
+            }
+        }
+        return article;
+    }
 }
 
