@@ -20,7 +20,7 @@ public class ScheduleTask {
      * 定时邮件发送任务，每月1日中午12点整发送邮件
      */
 //    @Scheduled(cron = "0 0 12 1 * ?")   //    每12点发送
-    @Scheduled(cron = "0 */1 * * * ? ")     //每三分钟发送
+    @Scheduled(cron = "0 */3 * * * ? ")     //每三分钟发送
     public void sendEmail(){
         //  定制邮件内容
         long totalvisit = statisticMapper.getTotalVisit();
